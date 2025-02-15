@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>.nbs to .htsl converter</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- .nbs to .htsl converter -->
+    <h1>.nbs to .htsl converter</h1>
+
+    <label for="file">Select a .nbs file</label>
+    <input type="file" id="file" accept=".nbs" />
+
+    <div id="info"></div>
+
+    <div>
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>Author</th>
+          <th>Original author</th>
+          <th>Description</th>
+          <th>Tempo (Ticks per second)</th>
+          <th>NBS version</th>
+          <th>Length</th>
+        </tr>
+        <tr>
+          <td id="song-name"></td>
+          <td id="song-author"></td>
+          <td id="song-original-author"></td>
+          <td id="song-description"></td>
+          <td id="song-tempo"></td>
+          <td id="song-version"></td>
+          <td id="song-length"></td>
+        </tr>
+      </table>
+    </div>
+
+    <button id="convert">Convert</button>
+
+    <div id="outputs"></div>
+
+    <footer>
+      <p>Made by ImaDoofus, edited by BusterBrown1218 for latest update.</p>
+    </footer>
+    <script src="main.js"></script>
+  </body>
+</html>
