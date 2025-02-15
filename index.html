@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>.nbs to .htsl converter</title>
+    <title>.nbs到.htsl转换器</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <!-- .nbs to .htsl converter -->
-    <h1>.nbs to .htsl converter</h1>
+    <h1>.nbs到.htsl转换器</h1>
 
     <label for="file">Select a .nbs file</label>
     <input type="file" id="file" accept=".nbs" />
@@ -18,13 +18,13 @@
     <div>
       <table>
         <tr>
-          <th>Name</th>
-          <th>Author</th>
-          <th>Original author</th>
-          <th>Description</th>
-          <th>Tempo (Ticks per second)</th>
-          <th>NBS version</th>
-          <th>Length</th>
+          <th>名称</th>
+          <th>作者</th>
+          <th>原作者</th>
+          <th>描述</th>
+          <th>频率 (每秒1tick)</th>
+          <th>NBS版本</th>
+          <th>长度</th>
         </tr>
         <tr>
           <td id="song-name"></td>
@@ -38,7 +38,7 @@
       </table>
     </div>
 
-    <button id="convert">Convert</button>
+    <button id="convert">开始转换</button>
 
     <div id="outputs"></div>
 
