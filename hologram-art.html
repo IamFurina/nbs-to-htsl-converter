@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Minecraft Color Codes</title>
+    <style>
+        @font-face {
+            font-family: 'MinecraftFont';
+            src: url("./Minecraft.ttf") format('truetype');
+        }
+
+        body {
+            font-family: 'MinecraftFont';
+            text-align: center;
+            background-color:#242424;
+            color: white;
+        }
+            
+        #title {
+            text-align: center;
+            border-radius: 20px;
+            color: rgb(255, 0, 255);
+            text-shadow: 6px 0 #000, -6px 0 #000, 0 6px #000, 0 -6px #000;
+            font-size: 50px;
+        }
+
+        #credits {
+            text-align: center;
+            color: rgb(181, 181, 181);
+            text-shadow: 4px 0 #000, -4px 0 #000, 0 4px #000, 0 -4px #000;
+        }
+        
+        #description {
+            text-align: center; 
+            color: rgb(255, 255, 255);
+            text-shadow: 4px 0 #000, -px 0 #000, 0 4px #000, 0 -4px #000;
+        }
+
+        #convertButton {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        #outputTable {
+            margin: 0 auto; /* Center-align the table horizontally */
+            width: 100%; /* Set the table width to 100% of its container */
+        }
+
+        #outputTable,
+        #outputTable th,
+        #outputTable td {
+            /* text-align: center; */
+            border: 1px solid whitesmoke; /* Change border style to solid */
+            white-space: normal;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 id="title">图片到家园Hologram像素画转换器</h1>
+    <h1 id="credits">由Al3xWarrior制作</h1>
+    <h2 id="description">Go through each pixel in an image to convert it to the closest color code.</h2>
+    <input type="file" id="uploadInput">
+    <button id="convertButton">开始转换</button>
+    <canvas id="outputCanvas"></canvas>
+    <table id="outputTable">
+        <thead>
+            <tr>
+                <th>Row</th>
+                <th>Pixel Art</th>
+                <th>Copy</th>
+            </tr>
+        </thead>
+        <tbody id="outputBody">
+            <!-- Populated by JavaScript -->
+        </tbody>
+    </table>
+    <button id="clearTableButton">清除全部</button>
+    <script>
+        const uploadInput = document.getElementById("uploadInput");
+        const convertButton = document.getElementById("convertButton");
+        const outputCanvas = document.getElementById("outputCanvas");
+        const outputTable = document.getElementById("outputTable");
+        const clearTableButton = document.getElementById("clearTableButton");
+        const ctx = outputCanvas.getContext("2d");
+
+        var rows = [];
+        const colorMapping = { // █ ▓ ░
+            "000000": ["0", "█"],
+            "0000aa": ["1", "█"],
+            "00aa00": ["2", "█"],
+            "00aaaa": ["3", "█"],
+            "aa0008": ["4", "█"],
+            "aa00aa": ["5", "█"],
+            "ffaa00": ["6", "█"],
+            "aaaaaa": ["7", "█"],
+            "555555": ["7", "░"],
+            "5555ff": ["9", "█"],
+            "55ff55": ["a", "█"],
+            "55ffff": ["b", "█"],
+            "ff5555": ["c", "█"],
+            "ff55ff": ["d", "█"],
+            "ffff55": ["e", "█"],
+            "ffffff": ["f", "█"],
+            "00007f": ["1", "▓"],
+            "007f00": ["2", "▓"],
+            "007f7f": ["3", "▓"],
+            "7f0000": ["4", "▓"],
+            "7f007f": ["5", "▓"],
+            "bf7f00": ["6", "▓"],
+            "7f7f7f": ["f", "▓"],
+            "3f3f3f": ["8", "▓"],
+            "3f3fbf": ["9", "▓"],
+            "3fbf3f": ["a", "▓"],
+            "3fbfbf": ["b", "▓"],
+            "bf3f3f": ["c", "▓"],
+            "bf3fbf": ["d", "▓"],
+            "bfbf3f": ["e", "▓"]
+        };
+
+        uploadInput.addEventListener("change", handleImageUpload);
+        convertButton.addEventListener("click", () => {
+            convertImageToMinecraftColors();
+            displayOutputTable();
+        });
+
+        clearTableButton.addEventListener("click", () => {
+            var tbody = document.getElementById("outputBody");
+
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+
+            rows = [];
+        });
+
+
+
+        function handleImageUpload(event) {
+            const imageFile = event.target.files[0];
+            const img = new Image();
+            img.src = URL.createObjectURL(imageFile);
+
+            img.onload = () => {
+                outputCanvas.width = img.width;
+                outputCanvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+            };
+        }
+
+        function convertImageToMinecraftColors() {
+            const imageData = ctx.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
+            const pixels = imageData.data;
+
+            for (let y = 0; y < outputCanvas.height; y++) {
+
+                var pixel = '';
+                for (let x = 0; x < outputCanvas.width; x++) {
+                    // Shoutout to chatgpt for helping me with whatever this means
+                    const index = (y * outputCanvas.width + x) * 4;
+
+                    const red = pixels[index];
+                    const green = pixels[index + 1];
+                    const blue = pixels[index + 2];
+
+                    let closestColor = null;
+                    let closestDistance = Number.POSITIVE_INFINITY;
+
+                    // Calculate the Euclidean distance to find the closest color. Huge thanks to my sponsor ChatGPT
+                    for (const hexColor in colorMapping) {
+                        const color = hexColor.match(/.{2}/g).map(val => parseInt(val, 16));
+                        const distance = Math.sqrt(
+                            Math.pow(color[0] - red, 2) +
+                            Math.pow(color[1] - green, 2) +
+                            Math.pow(color[2] - blue, 2)
+                        );
+
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestColor = colorMapping[hexColor];
+                        }
+                    }
+
+                    // Display or save the closest Minecraft color code along with position
+                    console.log(`Row: ${y}, Pixel: ${x}, Closest Color: ${closestColor}`);
+                    pixel = pixel+"&"+closestColor[0]+closestColor[1];
+                }
+                rows.push(pixel)
+            }
+            console.log(rows)
+        }
+
+        function displayOutputTable() {
+            const outputBody = document.getElementById("outputBody");
+            outputBody.innerHTML = "";
+
+            for (let y = 0; y < rows.length; y++) {
+                const row = document.createElement("tr");
+
+                const rowCell = document.createElement("td");
+                rowCell.textContent = y+1;
+                row.appendChild(rowCell);
+
+                const artCell = document.createElement("td");
+                artCell.textContent = rows[y];
+                row.appendChild(artCell);
+
+                const copyCell = document.createElement("td");
+                const copyButton = document.createElement("button");
+                copyButton.textContent = "Copy";
+                copyButton.id = `copyButton_${y}`;
+                copyButton.classList.add("copyButton");
+                copyCell.appendChild(copyButton);
+
+                // Thanks ChatGPT for showing me I can edit styles inside the JS code!
+                copyButton.style.backgroundColor = "#008e0c"; // Example background color
+                copyButton.style.color = "white"; // Example text color
+                copyButton.style.cursor = "pointer"; // Add pointer cursor for hover effect
+
+                row.appendChild(copyCell);
+
+                outputBody.appendChild(row);
+
+                // Add copy button click event listener
+                copyButton.addEventListener("click", () => {
+                    const textToCopy = rows[y];
+                    row.style = "background-color: rgb(240, 160, 0); color: white; cursor: pointer;";
+                    copyToClipboard(textToCopy);
+                });
+            }
+        }
+        
+        function copyToClipboard(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+        }
+    </script>
+</body>
+</html>
